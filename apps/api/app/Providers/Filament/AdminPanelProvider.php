@@ -46,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ])
 
             // === Estilo y estructura ===
-            ->colors(['primary' => Color::Blue, 'secondary' => Color::Gray ])
+            ->colors(['primary' => Color::Blue, 'secondary' => Color::Gray])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([ Dashboard::class ])
