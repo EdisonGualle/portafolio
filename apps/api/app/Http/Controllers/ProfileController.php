@@ -28,24 +28,4 @@ class ProfileController extends Controller
             200
         );
     }
-
-    public function update(SaveProfileRequest $request, $id)
-    {
-        $profile = Profile::find($id);
-
-        if (!$profile) {
-            return $this->errorResponse(
-                'Perfil no encontrado',
-                404
-            );
-        }
-
-        $profile->update($request->validated());
-
-        return $this->successResponse(
-            new ProfileResource($profile),
-            'Perfil actualizado correctamente',
-            200
-        );
-    }
 }
