@@ -18,9 +18,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 
-// ✅ Acciones (v4) + contenedor de acciones del Form
 use Filament\Actions\Action;
-use Filament\Forms\Components\Actions;
 use Filament\Support\Enums\Alignment;
 
 use Filament\Notifications\Notification;
@@ -80,7 +78,9 @@ class EditProfile extends Page implements HasSchemas
                             ->schema([
                                 FileUpload::make('photo_url')
                                     ->label('Foto de perfil')
+                                    ->disk('public')
                                     ->directory('profile')
+                                    ->visibility('public')
                                     ->image()
                                     ->imageEditor()
                                     ->maxSize(2048),
@@ -134,11 +134,14 @@ class EditProfile extends Page implements HasSchemas
                 ComponentsActions::make([
                     Action::make('save')
                         ->label('Guardar cambios')
+                        ->icon('heroicon-m-check')
                         ->color('primary')
                         ->keyBindings(['mod+s'])
                         ->action(fn() => $this->save()),
+
                     Action::make('cancel')
                         ->label('Cancelar')
+                        ->icon('heroicon-m-x-mark')
                         ->color('gray')
                         ->outlined()
                         ->action(fn() => $this->cancel()),
@@ -153,8 +156,9 @@ class EditProfile extends Page implements HasSchemas
 
     public function cancel(): void
     {
-        // Restablece los cambios no guardados
         $this->form->fill($this->profile->attributesToArray());
+
+        $this->redirect(ViewProfile::getUrl(), navigate: true);
     }
 
     public function save(): void
@@ -165,5 +169,7 @@ class EditProfile extends Page implements HasSchemas
             ->success()
             ->title('Perfil actualizado correctamente')
             ->send();
+
+        $this->redirect(ViewProfile::getUrl(), navigate: true);
     }
 }
