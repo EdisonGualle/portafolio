@@ -11,11 +11,10 @@ class Tag extends Model
         'slug',
     ];
 
-    // Relación con proyectos
-    // public function projects()
-    // {
-    //     return $this->belongsToMany(Project::class, 'project_tag');
-    // }
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_tag');
+    }
 
     // Relación con posts
     // public function posts()

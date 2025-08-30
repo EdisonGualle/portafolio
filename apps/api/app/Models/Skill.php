@@ -19,9 +19,8 @@ class Skill extends Model
         return $this->belongsTo(SkillCategory::class, 'category_id');
     }
 
-    // Relación con proyectos
-    // public function projects()
-    // {
-    //     return $this->belongsToMany(Project::class, 'project_skill');
-    // }
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_skill');
+    }
 }
