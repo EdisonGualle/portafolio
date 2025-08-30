@@ -39,9 +39,8 @@ class Project extends Model
         return $this->belongsToMany(Tag::class, 'project_tag');
     }
 
-    /** Bloques dinámicos (se implementa más adelante) */
-    // public function blocks(): HasMany
-    // {
-    //     return $this->hasMany(ProjectBlock::class);
-    // }
+    public function blocks()
+    {
+        return $this->hasMany(ProjectBlock::class);
+    }
 }

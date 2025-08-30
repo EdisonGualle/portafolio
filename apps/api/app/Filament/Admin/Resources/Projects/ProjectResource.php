@@ -43,9 +43,10 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Ej: podrías añadir blocks más adelante
+            RelationManagers\BlocksRelationManager::class,
         ];
     }
+
 
     public static function getPages(): array
     {
