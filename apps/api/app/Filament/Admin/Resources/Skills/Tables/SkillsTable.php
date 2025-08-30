@@ -20,7 +20,6 @@ class SkillsTable
                     ->searchable()
                     ->sortable(),
 
-                // 👇 mostrar el nombre de la categoría (relación)
                 TextColumn::make('category.name')
                     ->label('Categoría')
                     ->searchable()
@@ -51,7 +50,6 @@ class SkillsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // 👇 filtro por categoría (opcional)
                 SelectFilter::make('category')
                     ->label('Categoría')
                     ->relationship('category', 'name'),

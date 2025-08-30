@@ -13,14 +13,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class SkillResource extends Resource
 {
     protected static ?string $model = Skill::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Sparkles;
-    protected static string|\UnitEnum|null   $navigationGroup = 'Habilidades';
-    protected static ?int $navigationSort = 10;
+    protected static string|UnitEnum|null   $navigationGroup = 'Habilidades';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
