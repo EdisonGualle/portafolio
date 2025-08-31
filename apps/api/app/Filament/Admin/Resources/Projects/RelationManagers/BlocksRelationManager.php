@@ -114,7 +114,9 @@ class BlocksRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->label('Agregar bloque')
+                    ->icon('heroicon-m-plus'),
             ])
             ->recordActions([
                 EditAction::make(),

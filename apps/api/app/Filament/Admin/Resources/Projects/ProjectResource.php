@@ -28,6 +28,7 @@ class ProjectResource extends Resource
     protected static ?string $recordTitleAttribute = 'title';
 
     protected static ?string $label = 'Proyecto';
+    
     protected static ?string $pluralLabel = 'Proyectos';
 
     public static function form(Schema $schema): Schema

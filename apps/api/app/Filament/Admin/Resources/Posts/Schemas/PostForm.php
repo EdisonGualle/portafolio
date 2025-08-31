@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Projects\Schemas;
+namespace App\Filament\Admin\Resources\Posts\Schemas;
 
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -14,67 +14,58 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Schema;
 
-class ProjectForm
+class PostForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Tabs::make('ProjectTabs')
+                Tabs::make('PostTabs')
                     ->columnSpanFull()
                     ->tabs([
                         Tab::make('Información')->schema([
-                            Grid::make(2)
-                                ->schema([
-                                    TextInput::make('title')
-                                        ->label('Título')
-                                        ->required()
-                                        ->maxLength(180),
+                            Grid::make(2)->schema([
+                                TextInput::make('title')
+                                    ->label('Título')
+                                    ->required()
+                                    ->maxLength(180),
 
-                                    TextInput::make('slug')
-                                        ->label('Slug')
-                                        ->required()
-                                        ->unique(ignoreRecord: true)
-                                        ->maxLength(200),
-                                ]),
+                                TextInput::make('slug')
+                                    ->label('Slug')
+                                    ->required()
+                                    ->unique(ignoreRecord: true)
+                                    ->maxLength(200),
+                            ]),
 
-                            Textarea::make('summary')
+                            Textarea::make('excerpt')
                                 ->label('Resumen')
                                 ->rows(3)
                                 ->columnSpanFull(),
 
                             MarkdownEditor::make('body_md')
-                                ->label('Descripción')
+                                ->label('Contenido')
                                 ->columnSpanFull(),
                         ]),
 
                         Tab::make('Relaciones')->schema([
-                            Grid::make(2)
-                                ->schema([
-                                    Select::make('skills')
-                                        ->label('Skills')
-                                        ->multiple()
-                                        ->relationship('skills', 'name')
-                                        ->preload(),
+                            Grid::make(2)->schema([
+                                Select::make('series_id')
+                                    ->label('Serie')
+                                    ->relationship('series', 'title')
+                                    ->searchable()
+                                    ->preload()
+                                    ->placeholder('Seleccione una serie'),
 
-                                    Select::make('tags')
-                                        ->label('Tags')
-                                        ->multiple()
-                                        ->relationship('tags', 'name')
-                                        ->preload(),
-                                ]),
+                                Select::make('tags')
+                                    ->label('Tags')
+                                    ->multiple()
+                                    ->relationship('tags', 'name')
+                                    ->preload(),
+                            ]),
                         ]),
 
                         Tab::make('Publicación')->schema([
                             Grid::make(2)->schema([
-                                Toggle::make('featured')
-                                    ->label('Destacado'),
-
-                                TextInput::make('sort_order')
-                                    ->label('Orden')
-                                    ->numeric()
-                                    ->default(0),
-
                                 Select::make('status')
                                     ->label('Estado')
                                     ->options([
@@ -87,20 +78,9 @@ class ProjectForm
                                 DateTimePicker::make('published_at')
                                     ->label('Fecha de publicación'),
                             ]),
-
-                            Grid::make(2)->schema([
-                                TextInput::make('repo_url')
-                                    ->label('Repositorio')
-                                    ->url()
-                                    ->placeholder('https://github.com/usuario/proyecto'),
-
-                                TextInput::make('demo_url')
-                                    ->label('Demo')
-                                    ->url()
-                                    ->placeholder('https://mi-proyecto-demo.com'),
-                            ]),
                         ]),
-                       
+
+
                         Tab::make('SEO')->schema([
                             FileUpload::make('og_image_url')
                                 ->label('Imagen OG')
@@ -116,6 +96,7 @@ class ProjectForm
                                 ->openable()                             
                                 ->downloadable(),                       
                         ]),
+
                     ]),
             ]);
     }

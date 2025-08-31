@@ -18,10 +18,11 @@ class SeriesTable
                     ->label('Título')
                     ->searchable(),
                 TextColumn::make('slug')
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(30),
                 TextColumn::make('description')
                     ->label('Descripción')
-                    ->limit(50)
+                    ->limit(30)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sort_order')
                     ->label('Orden')
