@@ -16,9 +16,8 @@ class Tag extends Model
         return $this->belongsToMany(Project::class, 'project_tag');
     }
 
-    // Relación con posts
-    // public function posts()
-    // {
-    //     return $this->belongsToMany(Post::class, 'post_tag');
-    // }
+    public function posts()
+    {
+        return $this->belongsToMany(Post::class, 'post_tag');
+    }
 }
