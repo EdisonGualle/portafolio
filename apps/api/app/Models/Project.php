@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Project extends Model
 {
@@ -42,5 +43,15 @@ class Project extends Model
     public function blocks()
     {
         return $this->hasMany(ProjectBlock::class);
+    }
+
+    public function previewTokens(): MorphMany
+    {
+        return $this->morphMany(PreviewToken::class, 'previewable', 'model_type', 'model_id');
+    }
+
+    public function activePreviewToken(): ?PreviewToken
+    {
+        return $this->previewTokens()->valid()->latest('expires_at')->first();
     }
 }

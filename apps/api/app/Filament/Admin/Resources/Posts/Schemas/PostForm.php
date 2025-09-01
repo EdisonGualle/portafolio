@@ -9,10 +9,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str; 
 
 class PostForm
 {
@@ -23,18 +24,29 @@ class PostForm
                 Tabs::make('PostTabs')
                     ->columnSpanFull()
                     ->tabs([
+
                         Tab::make('Información')->schema([
                             Grid::make(2)->schema([
                                 TextInput::make('title')
                                     ->label('Título')
                                     ->required()
-                                    ->maxLength(180),
+                                    ->maxLength(180)
+                                    // Autorellena el slug solo si está vacío
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (?string $state, callable $set, Get $get) {
+                                        if (blank($get('slug')) && filled($state)) {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    }),
 
                                 TextInput::make('slug')
                                     ->label('Slug')
                                     ->required()
+                                    ->maxLength(200)
+                                    ->rule('alpha_dash')
                                     ->unique(ignoreRecord: true)
-                                    ->maxLength(200),
+                                    ->helperText('Se autogenera desde el título; puedes ajustarlo.')
+                                    ->dehydrateStateUsing(fn (?string $state) => filled($state) ? Str::slug($state) : null),
                             ]),
 
                             Textarea::make('excerpt')
@@ -60,6 +72,7 @@ class PostForm
                                     ->label('Tags')
                                     ->multiple()
                                     ->relationship('tags', 'name')
+                                    ->searchable()
                                     ->preload(),
                             ]),
                         ]),
@@ -69,17 +82,17 @@ class PostForm
                                 Select::make('status')
                                     ->label('Estado')
                                     ->options([
-                                        'draft' => 'Borrador',
+                                        'draft'     => 'Borrador',
                                         'published' => 'Publicado',
                                     ])
                                     ->default('draft')
                                     ->required(),
 
                                 DateTimePicker::make('published_at')
-                                    ->label('Fecha de publicación'),
+                                    ->label('Fecha de publicación')
+                                    ->native(false),
                             ]),
                         ]),
-
 
                         Tab::make('SEO')->schema([
                             FileUpload::make('og_image_url')
@@ -88,15 +101,14 @@ class PostForm
                                 ->disk('public')
                                 ->directory('posts/og/' . date('Y/m/d'))
                                 ->visibility('public')
-                                ->imageEditor()                        
+                                ->imageEditor()
                                 ->imageResizeMode('cover')
                                 ->imagePreviewHeight('200')
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                ->preserveFilenames()                   
-                                ->openable()                             
-                                ->downloadable(),                       
+                                ->preserveFilenames()
+                                ->openable()
+                                ->downloadable(),
                         ]),
-
                     ]),
             ]);
     }

@@ -12,7 +12,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class ProjectForm
 {
@@ -23,20 +25,30 @@ class ProjectForm
                 Tabs::make('ProjectTabs')
                     ->columnSpanFull()
                     ->tabs([
-                        Tab::make('Información')->schema([
-                            Grid::make(2)
-                                ->schema([
-                                    TextInput::make('title')
-                                        ->label('Título')
-                                        ->required()
-                                        ->maxLength(180),
 
-                                    TextInput::make('slug')
-                                        ->label('Slug')
-                                        ->required()
-                                        ->unique(ignoreRecord: true)
-                                        ->maxLength(200),
-                                ]),
+                        // ===================== Información =====================
+                        Tab::make('Información')->schema([
+                            Grid::make(2)->schema([
+                                TextInput::make('title')
+                                    ->label('Título')
+                                    ->required()
+                                    ->maxLength(180)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (?string $state, callable $set, Get $get) {
+                                        if (blank($get('slug')) && filled($state)) {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    }),
+
+                                TextInput::make('slug')
+                                    ->label('Slug')
+                                    ->required()
+                                    ->unique(ignoreRecord: true)
+                                    ->rule('alpha_dash')
+                                    ->maxLength(200)
+                                    ->helperText('Se autogenera desde el título; puedes ajustarlo.')
+                                    ->dehydrateStateUsing(fn (?string $state) => filled($state) ? Str::slug($state) : null),
+                            ]),
 
                             Textarea::make('summary')
                                 ->label('Resumen')
@@ -48,23 +60,26 @@ class ProjectForm
                                 ->columnSpanFull(),
                         ]),
 
+                        // ===================== Relaciones =====================
                         Tab::make('Relaciones')->schema([
-                            Grid::make(2)
-                                ->schema([
-                                    Select::make('skills')
-                                        ->label('Skills')
-                                        ->multiple()
-                                        ->relationship('skills', 'name')
-                                        ->preload(),
+                            Grid::make(2)->schema([
+                                Select::make('skills')
+                                    ->label('Skills')
+                                    ->multiple()
+                                    ->relationship('skills', 'name')
+                                    ->searchable()
+                                    ->preload(),
 
-                                    Select::make('tags')
-                                        ->label('Tags')
-                                        ->multiple()
-                                        ->relationship('tags', 'name')
-                                        ->preload(),
-                                ]),
+                                Select::make('tags')
+                                    ->label('Tags')
+                                    ->multiple()
+                                    ->relationship('tags', 'name')
+                                    ->searchable()
+                                    ->preload(),
+                            ]),
                         ]),
 
+                        // ===================== Publicación =====================
                         Tab::make('Publicación')->schema([
                             Grid::make(2)->schema([
                                 Toggle::make('featured')
@@ -78,14 +93,15 @@ class ProjectForm
                                 Select::make('status')
                                     ->label('Estado')
                                     ->options([
-                                        'draft' => 'Borrador',
+                                        'draft'     => 'Borrador',
                                         'published' => 'Publicado',
                                     ])
                                     ->default('draft')
                                     ->required(),
 
                                 DateTimePicker::make('published_at')
-                                    ->label('Fecha de publicación'),
+                                    ->label('Fecha de publicación')
+                                    ->native(false),
                             ]),
 
                             Grid::make(2)->schema([
@@ -100,21 +116,22 @@ class ProjectForm
                                     ->placeholder('https://mi-proyecto-demo.com'),
                             ]),
                         ]),
-                       
+
+                        // ===================== SEO =====================
                         Tab::make('SEO')->schema([
                             FileUpload::make('og_image_url')
                                 ->label('Imagen OG')
                                 ->image()
                                 ->disk('public')
-                                ->directory('posts/og/' . date('Y/m/d'))
+                                ->directory('projects/og/' . date('Y/m/d'))
                                 ->visibility('public')
-                                ->imageEditor()                        
+                                ->imageEditor()
                                 ->imageResizeMode('cover')
                                 ->imagePreviewHeight('200')
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                ->preserveFilenames()                   
-                                ->openable()                             
-                                ->downloadable(),                       
+                                ->preserveFilenames()
+                                ->openable()
+                                ->downloadable(),
                         ]),
                     ]),
             ]);
