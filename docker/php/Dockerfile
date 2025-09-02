@@ -1,14 +1,16 @@
 FROM php:8.3-fpm
 
-# Paquetes necesarios para extensiones PHP
+# Paquetes necesarios para extensiones PHP y binarios de imágenes
 RUN apt-get update && apt-get install -y \
     git curl unzip \
     libzip-dev zlib1g-dev \
     libicu-dev \
     libpq-dev \
-    libpng-dev libjpeg-dev libfreetype6-dev \
+    libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev \
     libonig-dev libxml2-dev \
- && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    # Binarios que usa Spatie Media Library
+    webp jpegoptim optipng pngquant \
+ && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install -j"$(nproc)" \
     intl \
     gd \

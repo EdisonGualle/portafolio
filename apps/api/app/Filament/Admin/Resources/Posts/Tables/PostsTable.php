@@ -5,10 +5,12 @@ namespace App\Filament\Admin\Resources\Posts\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+
+// 👇 Spatie + Filament (columna para Media Library)
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class PostsTable
 {
@@ -16,11 +18,18 @@ class PostsTable
     {
         return $table
             ->columns([
+                // Imagen OG (Media Library -> conversion 'thumb')
+                SpatieMediaLibraryImageColumn::make('og')
+                    ->collection('og')
+                    ->conversion('thumb')
+                    ->label('OG')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('title')
                     ->label('Título')
                     ->searchable()
                     ->sortable()
-                    ->description(fn($record) => $record->slug),
+                    ->description(fn ($record) => $record->slug),
 
                 TextColumn::make('excerpt')
                     ->label('Resumen')
@@ -35,7 +44,7 @@ class PostsTable
                         'warning' => 'draft',
                         'success' => 'published',
                     ])
-                    ->formatStateUsing(fn(string $state): string => $state === 'draft' ? 'Borrador' : 'Publicado'),
+                    ->formatStateUsing(fn (string $state): string => $state === 'draft' ? 'Borrador' : 'Publicado'),
 
                 TextColumn::make('published_at')
                     ->label('Publicado en')
@@ -51,12 +60,6 @@ class PostsTable
                     ->label('Tags')
                     ->badge()
                     ->separator(','),
-
-                ImageColumn::make('og_image_url')
-                    ->label('Imagen OG')
-                    ->disk('public')
-                    ->square()
-                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
                     ->label('Creado')

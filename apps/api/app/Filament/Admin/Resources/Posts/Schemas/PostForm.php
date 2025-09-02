@@ -10,10 +10,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str; 
+use Illuminate\Support\Str;
+
+// 👇 Spatie + Filament (input para Media Library)
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class PostForm
 {
@@ -31,7 +33,6 @@ class PostForm
                                     ->label('Título')
                                     ->required()
                                     ->maxLength(180)
-                                    // Autorellena el slug solo si está vacío
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function (?string $state, callable $set, Get $get) {
                                         if (blank($get('slug')) && filled($state)) {
@@ -46,7 +47,7 @@ class PostForm
                                     ->rule('alpha_dash')
                                     ->unique(ignoreRecord: true)
                                     ->helperText('Se autogenera desde el título; puedes ajustarlo.')
-                                    ->dehydrateStateUsing(fn (?string $state) => filled($state) ? Str::slug($state) : null),
+                                    ->dehydrateStateUsing(fn(?string $state) => filled($state) ? Str::slug($state) : null),
                             ]),
 
                             Textarea::make('excerpt')
@@ -94,21 +95,38 @@ class PostForm
                             ]),
                         ]),
 
+
                         Tab::make('SEO')->schema([
-                            FileUpload::make('og_image_url')
+                            SpatieMediaLibraryFileUpload::make('og')
                                 ->label('Imagen OG')
+                                ->collection('og')               
                                 ->image()
-                                ->disk('public')
-                                ->directory('posts/og/' . date('Y/m/d'))
-                                ->visibility('public')
                                 ->imageEditor()
-                                ->imageResizeMode('cover')
-                                ->imagePreviewHeight('200')
-                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->imageCropAspectRatio('1200:630')
                                 ->preserveFilenames()
+                                ->responsiveImages()
                                 ->openable()
-                                ->downloadable(),
+                                ->downloadable()
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->maxSize(4096), // 4MB
                         ]),
+
+                        // (Opcional) Galería para el Post
+                        Tab::make('Galería')->schema([
+                            SpatieMediaLibraryFileUpload::make('gallery')
+                                ->collection('gallery')
+                                 ->conversion('thumb') 
+                                ->multiple()
+                                ->reorderable()
+                                ->panelLayout('grid')
+                                ->image()
+                                ->imageEditor()
+                                ->preserveFilenames()
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->maxFiles(12)
+                                ->maxSize(6144)
+                        ]),
+
                     ]),
             ]);
     }
