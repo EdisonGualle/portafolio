@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev \
     libonig-dev libxml2-dev \
+    libmagickwand-dev \
     # Binarios que usa Spatie Media Library
     webp jpegoptim optipng pngquant \
  && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -17,8 +18,8 @@ RUN apt-get update && apt-get install -y \
     pdo pdo_mysql pdo_pgsql \
     mbstring exif pcntl bcmath \
     opcache zip \
- && pecl install redis \
- && docker-php-ext-enable redis \
+ && pecl install redis imagick \
+ && docker-php-ext-enable redis imagick \
  && rm -rf /var/lib/apt/lists/*
 
 # Composer
