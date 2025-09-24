@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,6 +19,7 @@ use Spatie\Image\Enums\Fit;
 
 class Post extends Model implements HasMedia
 {
+    use HasFactory;
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -58,6 +61,17 @@ class Post extends Model implements HasMedia
     public function activePreviewToken(): ?PreviewToken
     {
         return $this->previewTokens()->valid()->latest('expires_at')->first();
+    }
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query
+            ->where('status', 'published')
+            ->where(function ($scope) {
+                $scope
+                    ->whereNull('published_at')
+                    ->orWhere('published_at', '<=', now());
+            });
     }
 
     /* -------------------------
